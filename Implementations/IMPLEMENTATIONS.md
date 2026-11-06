@@ -3,25 +3,33 @@
 This document inventories every denoiser implemented in this repository, states the protocol each
 number comes from, and compares them. It is written to be read alongside:
 
-* `joint_ksvd_tgv_fusion.ipynb` — the early-stage joint energy method (new),
-* `results_joint_energy/` — its tables and figures,
-* `RESULTS_SUMMARY.md` — the adaptive K-SVD+TGV study,
-* `JOINT_FEASIBILITY_REPORT.md` — the alternating-loop feasibility study,
+* `Implementations/joint_ksvd_tgv_fusion.ipynb` — the early-stage joint energy method (new),
+* `Implementations/results_joint_energy/` — its tables and figures,
+* `Implementations/cascaded_ksvd_tgv.ipynb` — the adaptive (cascaded) K-SVD+TGV study,
 * `Comparison/outputs/` — the tuned four-method comparison.
+
+The earlier write-ups `RESULTS_SUMMARY.md` (adaptive K-SVD+TGV) and `JOINT_FEASIBILITY_REPORT.md`
+(alternating-loop feasibility), and their `adaptive_oct/` code, are **not part of this repository**.
+Their numbers are kept below for reference only. The adaptive pipeline itself is now
+`cascaded_ksvd_tgv.ipynb`.
 
 ---
 
 ## 0. Repository map
 
+All paths are relative to the repository root.
+
 | folder / file | method | entry point | results |
 |---|---|---|---|
-| `OMP_KSVD/` | K-SVD + OMP sparse coding (Zhang et al. 2022) | `denoising.ipynb`, `outputs/checkpoints/global_dict.npz` | `outputs/table3_real_data.csv` |
-| `tgv/` | second-order TGV decomposition (Duan et al. 2016) | `oct_tgv_pipeline.ipynb`, `src/tgv.py` | `tgv/results/` |
-| `NLM_PSO_Denoising/` | FCFDS-kernel non-local means (Chen & Gao 2022); modified-soft-threshold wavelet tuned by PSO (Subhedar et al. 2023) | `NLM_Denoising.ipynb`, `PSO_Denoising.ipynb` | inside the notebooks |
-| `Comparison/` | the four methods behind one interface + tuned benchmark | `comparison.ipynb`, `methods.py` | `outputs/metrics_per_image.csv`, `summary_*.csv` |
-| `adaptive_oct/` | K-SVD then TGV with spatially varying weights (methods A–F) | `scripts/run_adaptive_benchmark.py` | `results_adaptive/` |
-| `adaptive_oct/joint_solver.py` | alternating K-SVD/TGV feedback loop | `scripts/run_joint_feasibility.py` | `results_joint/` |
-| `joint_ksvd_tgv_fusion.ipynb` | **early-stage joint energy** (K-SVD prior + TGV² in one objective) | the notebook | `results_joint_energy/` |
+| `KSVD_OMP/` | K-SVD + OMP sparse coding (Zhang et al. 2022) | `ksvd.ipynb`, `outputs/checkpoints/global_dict.npz` | `KSVD_OMP/outputs/table3_real_data.csv` |
+| `TGV_denoising/` | second-order TGV decomposition (Duan et al. 2016) | `scripts/00…07_*.py`, `src/tgv.py` | `TGV_denoising/results/` |
+| `NLM_Denoising/` | FCFDS-kernel non-local means (Chen & Gao 2022) | `NLM_Denoising.ipynb` | `NLM_Denoising/outputs/duke_nlm/` (created on run) |
+| `PSO_Denoising/` | modified-soft-threshold wavelet tuned by PSO (Subhedar et al. 2023) | `PSO_Denoising.ipynb` | `PSO_Denoising/outputs/duke/` (created on run) |
+| `Hybrid_PnP_Denoising/` | PnP-ADMM hybrid: TGV² model step + non-local-means denoiser (NLM / TGV / BM3D baselines) | `Hybrid_PnP_Denoising.ipynb` | `Hybrid_PnP_Denoising/outputs/` (created on run) |
+| `Comparison/` | the four methods behind one interface + tuned benchmark | `comparison.ipynb`, `methods.py` | `Comparison/outputs/metrics_per_image.csv`, `summary_*.csv` |
+| `Implementations/cascaded_ksvd_tgv.ipynb` | K-SVD then TGV with spatially varying weights (methods A–F) | the notebook | `Implementations/results_cascaded/` (created on run) |
+| `Implementations/joint_ksvd_tgv_fusion.ipynb` | **early-stage joint energy** (K-SVD prior + TGV² in one objective) | the notebook | `Implementations/results_joint_energy/` |
+| `KSVD_TGV_Fusion/` | spatially varying pixel-wise fusion of K-SVD and TGV outputs | `ksvd_tgv_fusion_analysis.ipynb` | `KSVD_TGV_Fusion/figures/` |
 | `Sparsity_SDOCT_DATASET_2012/` | 17 paired raw / averaged SDOCT B-scans | — | — |
 
 ---
@@ -44,7 +52,7 @@ the 10–90 % boundary rise distance in px (larger = softer edge).
 **Two benchmarks exist in the repository and they must not be mixed:**
 
 1. **17-subject protocol, repository-frozen settings** — used by `results_adaptive/`,
-   `results_joint/` and `results_joint_energy/`. All rows in §3.1 share this protocol, so they are
+   `results_joint/` (neither is included in this repository) and `results_joint_energy/`. All rows in §3.1 share this protocol, so they are
    directly comparable to each other.
 2. **13-image protocol with per-method tuning** — `Comparison/outputs/`, where each method's
    strength parameters were grid-tuned on 4 images before scoring 13 evaluation images. This yields
@@ -359,28 +367,27 @@ constraint.
 ## 7. Reproduction
 
 ```bash
+# from the repository root, after: pip install -r requirements.txt
+# (each notebook is executed from its own folder, so its relative paths resolve)
+
 # joint energy (this work) — executes the notebook end to end (~20 min, CPU)
-cd /home/ananth/oct_denoising
-PATH=$PWD/OMP_KSVD/venv/bin:$PATH OMP_KSVD/venv/bin/jupyter nbconvert \
-    --to notebook --execute --inplace joint_ksvd_tgv_fusion.ipynb
+jupyter nbconvert --to notebook --execute --inplace Implementations/joint_ksvd_tgv_fusion.ipynb
+
+# adaptive (cascaded) K-SVD + TGV (methods A–F, figures)
+jupyter nbconvert --to notebook --execute --inplace Implementations/cascaded_ksvd_tgv.ipynb
 
 # tuned four-method comparison
-jupyter nbconvert --execute --inplace Comparison/comparison.ipynb
-
-# adaptive K-SVD + TGV (methods A–F, gates, figures)
-python scripts/run_adaptive_benchmark.py
-python -m pytest tests/test_adaptive.py -q
-
-# alternating feedback feasibility
-python scripts/run_joint_feasibility.py all
-python -m pytest tests/test_joint_solver.py -q
+jupyter nbconvert --to notebook --execute --inplace Comparison/comparison.ipynb
 
 # K-SVD dictionary training / denoising notebook
-jupyter nbconvert --execute --inplace OMP_KSVD/denoising.ipynb
+jupyter nbconvert --to notebook --execute --inplace KSVD_OMP/ksvd.ipynb
 
-# TGV reproduction pipeline
-jupyter nbconvert --execute --inplace tgv/oct_tgv_pipeline.ipynb
+# TGV reproduction pipeline (scripts, see TGV_denoising/README.md)
+cd TGV_denoising && python -m pytest tests/ -q && python scripts/04_real_data.py
 ```
+
+The alternating-feedback feasibility study (`run_joint_feasibility.py`) is not included in this
+repository.
 
 The joint notebook is deterministic (no RNG); re-running reproduces the tables and figures in
 `results_joint_energy/`.

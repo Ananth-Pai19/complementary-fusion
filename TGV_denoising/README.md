@@ -15,7 +15,7 @@ deep learning, no GPU.
 ## 1. Quick start
 
 ```bash
-cd dsp_mini_proj
+cd TGV_denoising          # the dataset is read from ../Sparsity_SDOCT_DATASET_2012
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 

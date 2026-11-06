@@ -1,0 +1,26 @@
+# complementary-fusion: dependencies for every notebook and script in this repository
+# Python 3.10+    install with:  pip install -r requirements.txt
+
+# ---- core numerics / imaging (used everywhere) ----
+numpy>=1.26
+scipy>=1.11
+scikit-image>=0.22        # SSIM, GLCM, filters, morphology
+PyWavelets>=1.5           # import pywt: wavelet / PSO denoising, Comparison/methods.py
+tifffile>=2023.7          # reading the dataset's .tif B-scans
+Pillow>=10.0              # import PIL: NLM, PSO and Hybrid PnP notebooks
+pandas>=2.0
+matplotlib>=3.8
+tqdm>=4.66                # progress bars: NLM, PSO and Hybrid PnP notebooks
+scikit-learn>=1.3         # KSVD_TGV_Fusion (HistGradientBoostingRegressor weight maps)
+
+# ---- TGV_denoising baselines and tests ----
+dtcwt>=0.13               # dual-tree complex wavelet baseline (src/baselines.py patches NumPy 2 incompatibilities)
+pytest>=8                 # TGV_denoising/tests
+
+# ---- notebooks ----
+jupyter>=1.0
+ipykernel>=6.0
+
+# ---- optional ----
+bm3d>=4.0                 # Hybrid_PnP_Denoising BM3D baseline; the notebook skips it if missing
+kagglehub>=0.2            # PSO_Denoising, only with OCT_DATASET=kermany (downloads Kermany OCT2017)

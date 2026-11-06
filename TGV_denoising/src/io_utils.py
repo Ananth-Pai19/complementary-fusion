@@ -35,8 +35,13 @@ __all__ = ["DATASET_DIR", "list_cases", "load_tif", "to_unit", "to_log",
            "load_case", "noise_model_slope"]
 
 
-DATASET_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                           "Sparsity_SDOCT_DATASET_2012")
+# The dataset lives at the repository root, one level above TGV_denoising/. A copy placed
+# inside TGV_denoising/ is still picked up first, and OCT_DUKE_DIR overrides both.
+_TGV_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_LOCAL_DATASET = os.path.join(_TGV_ROOT, "Sparsity_SDOCT_DATASET_2012")
+_REPO_DATASET = os.path.join(os.path.dirname(_TGV_ROOT), "Sparsity_SDOCT_DATASET_2012")
+DATASET_DIR = os.environ.get("OCT_DUKE_DIR") or (
+    _LOCAL_DATASET if os.path.isdir(_LOCAL_DATASET) else _REPO_DATASET)
 
 
 def load_tif(path):

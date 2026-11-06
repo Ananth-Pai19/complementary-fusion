@@ -4,12 +4,12 @@ The four OCT denoisers of this repository behind one interface, for comparison.i
 Every denoiser takes a raw B-scan on the 8-bit grey scale (float, 0-255) and returns the
 denoised image on the same scale, so all of them can be scored by the same metric code.
 
-    tgv_denoise   Duan et al. (2016), TGV^2 decomposition      -> imported from ../Denoising_..._decomposition/src
-    nlm_denoise   Chen & Gao (2022), FCFDS-kernel NLM          -> ported from ../NLM_PSO_Denoising/NLM_Denoising.ipynb
+    tgv_denoise   Duan et al. (2016), TGV^2 decomposition      -> imported from ../TGV_denoising/src
+    nlm_denoise   Chen & Gao (2022), FCFDS-kernel NLM          -> ported from ../NLM_Denoising/NLM_Denoising.ipynb
     wavelet_mst   Subhedar et al. (2023), modified soft
-                  threshold wavelet (+ PSO for its parameters) -> ported from ../NLM_PSO_Denoising/PSO_Denoising.ipynb
+                  threshold wavelet (+ PSO for its parameters) -> ported from ../PSO_Denoising/PSO_Denoising.ipynb
     ksvd_denoise  Zhang et al. (2022), K-SVD global dictionary
-                  + OMP with GLCM/Laplacian noise estimation   -> ported from ../OMP_KSVD/denoising.ipynb
+                  + OMP with GLCM/Laplacian noise estimation   -> ported from ../KSVD_OMP/ksvd.ipynb
 
 The ports are copies of the notebook code with the module-level constants turned into
 keyword arguments, so the strength parameters can be tuned from the comparison notebook.
@@ -33,8 +33,8 @@ from skimage.feature import graycomatrix
 from skimage.metrics import structural_similarity
 
 REPO = Path(__file__).resolve().parents[1]
-TGV_DIR = REPO / "Denoising_optical_coherence_tomography_using_second_order_total_generalized_variation_decomposition"
-KSVD_CHECKPOINT = REPO / "OMP_KSVD" / "outputs" / "checkpoints" / "global_dict.npz"
+TGV_DIR = REPO / "TGV_denoising"
+KSVD_CHECKPOINT = REPO / "KSVD_OMP" / "outputs" / "checkpoints" / "global_dict.npz"
 PEAK = 255.0
 
 sys.path.insert(0, str(TGV_DIR))
