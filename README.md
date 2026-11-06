@@ -1,4 +1,4 @@
-# complementary-fusion
+# Complementary Fusion Architecture for denoising OCT B-scans
 
 This is the code implementation of the proposed complementary fusion architecture for post processing of OCT B scans.
 
