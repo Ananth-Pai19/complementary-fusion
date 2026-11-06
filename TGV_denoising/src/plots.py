@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-
+import numpy as np  # noqa: E402  (kept at the bottom to avoid a circular-looking import order)
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -57,4 +57,3 @@ def panel_labels(fig, axes, labels=None, dx=-0.02, dy=1.03):
                 fontsize=9, va="bottom", ha="right")
 
 
-import numpy as np  # noqa: E402  (kept at the bottom to avoid a circular-looking import order)

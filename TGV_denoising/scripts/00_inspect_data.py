@@ -1,11 +1,5 @@
 """
-Step 0 - inspect the data: what is in Sparsity_SDOCT_DATASET_2012, and is it already
-log-compressed?
-
-Writes results/inspection/
-    dataset_summary.txt     sizes, dtypes, intensity statistics
-    noise_model.txt         additive-vs-multiplicative test (sigma_local ~ mu_local^p)
-    fig_dataset_overview.png  three raw frames + their averaged counterparts
+Step 0 - inspect the data
 """
 
 from __future__ import annotations
@@ -40,7 +34,7 @@ def main():
     print(txt)
     open(os.path.join(OUT, "dataset_summary.txt"), "w").write(txt + "\n")
 
-    # ---- additive vs multiplicative: sigma_local as a function of mu_local -------------
+    # additive vs multiplicative: sigma_local as a function of mu_local 
     nlines = ["Local-noise test:  log(sigma_local) = p * log(mu_local) + c",
               "p ~ 0  -> additive noise (log-domain data)",
               "p ~ 1  -> multiplicative noise (linear-domain data)", ""]
@@ -63,9 +57,6 @@ def main():
     save(fig, "noise_model_slope.png", "inspection")
     plt.close(fig)
 
-    # also test the *linearised* hypothesis: log(1+x) is what we would apply if the data
-    # were linear; if the data were linear, the p of the log-transformed version would
-    # drop towards 0.  We report both, so the choice is evidence-based.
     nlines.append("")
     for cid, raw, avg in cases[:3]:
         a = to_unit(load_tif(raw))
@@ -77,7 +68,7 @@ def main():
     print(txt)
     open(os.path.join(OUT, "noise_model.txt"), "w").write(txt + "\n")
 
-    # ---- overview figure -------------------------------------------------------------
+    # overview figure 
     fig, axes = plt.subplots(2, 3, figsize=(10, 5.4))
     for j, (cid, raw, avg) in enumerate(cases[:3]):
         show_gray(axes[0, j], to_unit(load_tif(raw)), f"case {cid}: raw")
